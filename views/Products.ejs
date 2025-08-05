@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nike Products</title>
+
+  <!-- ✅ CSS -->
+  <link rel="stylesheet" href="/style.css">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+
+  <nav>
+    <div class="logo">
+      <h1>Shoe<span>s</span></h1>
+    </div>
+
+    <ul>
+      <li><a href="index.ejs">Home</a></li>
+      <li><a href="products.ejs">Products</a></li>
+      <li><a href="about.ejs">About</a></li>
+      <li><a href="review.ejs">Review</a></li>
+      <li><a href="services.ejs">Services</a></li>
+    </ul>
+
+    <div class="icons">
+      <i class="fa-solid fa-heart"></i>
+      <i class="fa-solid fa-cart-shopping"></i>
+      <button onclick="window.location.href='login.ejs'" style="background: none; border: none; cursor: pointer;">
+        <i class="fa-solid fa-user"></i>
+      </button>
+    </div>
+  </nav>
+
+  <div class="products">
+    <h1>Products</h1>
+
+    <div class="box">
+      <% const products = [
+        { img: "shoes1.png", price: "100.99", stars: 5 },
+        { img: "shoes2.png", price: "200.99", stars: 4.5 },
+        { img: "shoes3.png", price: "175.99", stars: 3.5 },
+        { img: "shoes4.png", price: "120.99", stars: 4 },
+        { img: "shoes5.png", price: "150.99", stars: 5 },
+        { img: "shoes6.png", price: "220.99", stars: 4.5 },
+        { img: "shoes.png",  price: "110.99", stars: 3 },
+        { img: "shoes7.png", price: "150.99", stars: 4.5 }
+      ]; %>
+
+      <% products.forEach(product => { %>
+        <div class="card">
+          <div class="small_card">
+            <i class="fa-solid fa-heart"></i>
+            <i class="fa-solid fa-share"></i>
+          </div>
+          <div class="image">
+            <img src="/image/<%= product.img %>" alt="Nike Product">
+          </div>
+          <div class="products_text">
+            <h2>NIKE</h2>
+            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit.</p>
+            <h3>$<%= product.price %></h3>
+            <div class="products_star">
+              <% for (let i = 1; i <= 5; i++) { %>
+                <% if (product.stars >= i) { %>
+                  <i class="fa-solid fa-star"></i>
+                <% } else if (product.stars >= i - 0.5) { %>
+                  <i class="fa-solid fa-star-half-stroke"></i>
+                <% } else { %>
+                  <i class="fa-regular fa-star"></i>
+                <% } %>
+              <% } %>
+            </div>
+            <a href="#" class="btn">Add To Cart</a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+</body>
+</html>

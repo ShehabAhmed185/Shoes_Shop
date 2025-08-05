@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Reviews</title>
+
+  <!-- ✅ CSS -->
+  <link rel="stylesheet" href="/style.css">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+  <nav>
+    <div class="logo">
+      <h1>Shoe<span>s</span></h1>
+    </div>
+
+    <ul>
+      <li><a href="index.ejs">Home</a></li>
+      <li><a href="products.ejs">Products</a></li>
+      <li><a href="about.ejs">About</a></li>
+      <li><a href="review.ejs">Review</a></li>
+      <li><a href="services.ejs">Services</a></li>
+    </ul>
+
+    <div class="icons">
+      <i class="fa-solid fa-heart"></i>
+      <i class="fa-solid fa-cart-shopping"></i>
+      <button onclick="window.location.href='login.ejs'" style="background: none; border: none; cursor: pointer;">
+        <i class="fa-solid fa-user"></i>
+      </button>
+    </div>
+  </nav>
+
+  <div class="review">
+    <h1>Customer's<span>review</span></h1>
+
+    <div class="review_box">
+      <div class="review_card">
+        <div class="card_top">
+          <div class="profile">
+            <div class="profile_image">
+              <img src="/image/girl_dp1.jpg" alt="User">
+            </div>
+            <div class="name">
+              <strong>Ranidi Lochana</strong>
+              <div class="like">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star-half-stroke"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="comment">
+          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit...</p>
+        </div>
+      </div>
+
+      <!-- باقي الكروت هنا بنفس الشكل المعدل -->
+      <div class="review_card">
+        <div class="card_top">
+          <div class="profile">
+            <div class="profile_image">
+              <img src="/image/man_dp1.jpg" alt="User">
+            </div>
+            <div class="name">
+              <strong>Sayuru Tharanga</strong>
+              <div class="like">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star-half-stroke"></i>
+                <i class="fa-regular fa-star"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="comment">
+          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit...</p>
+        </div>
+      </div>
+
+      <!-- كمل باقي الكروت بنفس التعديل -->
+      <!-- كل الصور تعدلها إلى: /image/filename.jpg -->
+
+    </div>
+  </div>
+</body>
+</html>

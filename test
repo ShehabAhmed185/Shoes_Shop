@@ -1,0 +1,4 @@
+ // console.log("Data is Stored");
+
+    // const allData = await cusData.find();
+    // console.log(" All Data:", allData);

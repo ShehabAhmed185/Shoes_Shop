@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us</title>
+
+    <!-- ✅ تعديل مسار CSS -->
+    <link rel="stylesheet" href="/style.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <h1>Shoe<span>s</span></h1>
+        </div>
+
+        <ul>
+            <li><a href="index.ejs">Home</a></li>
+            <li><a href="products.ejs">Products</a></li>
+            <li><a href="about.ejs">About</a></li>
+            <li><a href="review.ejs">Review</a></li>
+            <li><a href="services.ejs">Services</a></li>
+        </ul>
+
+        <div class="icons">
+            <i class="fa-solid fa-heart"></i>
+            <i class="fa-solid fa-cart-shopping"></i>
+            <button onclick="window.location.href='login.ejs'" style="background: none; border: none; cursor: pointer;">
+                <i class="fa-solid fa-user"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="about" id="About">
+        <h1>Web<span>About</span></h1>
+
+        <div class="about_main">
+            <div class="about_image">
+                <div class="about_small_image">
+                    <img src="/image/red_shoes1.png" onclick="changeImage(this)">
+                    <img src="/image/red_shoes2.png" onclick="changeImage(this)">
+                    <img src="/image/red_shoes3.png" onclick="changeImage(this)">
+                    <img src="/image/red_shoes4.png" onclick="changeImage(this)">
+                </div>
+
+                <div class="image_contaner">
+                    <img src="/image/red_shoes1.png" id="imagebox">
+                </div>
+            </div>
+
+            <div class="about_text">
+                <p>
+                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical 
+                    Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at 
+                    Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a 
+                    Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the 
+                    undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" 
+                    (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, 
+                    very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes 
+                    from a line in section 1.10.32. The standard chunk of Lorem Ipsum used since the 1500s is reproduced below 
+                    for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also 
+                    reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+                </p>
+            </div>
+        </div>
+
+        <a href="#" class="about_btn">Shop Now</a>
+    </div>
+
+    <script>
+        function changeImage(small) {
+            const full = document.getElementById("imagebox");
+            full.src = small.src;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+
+  <!-- ✅ مسار CSS -->
+  <link rel="stylesheet" href="/style.css">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+  <div class="login_form">
+    <div class="left">
+      <img src="/image/logshoes.png" alt="Shoes">
+    </div>
+
+    <div class="right">
+      <h1>Create Account</h1>
+
+      <form action="/register" method="post">
+        <p>Full Name</p>
+        <div class="user">
+          <i class="fa-solid fa-user"></i>
+          <input type="text" name="name" placeholder="Your Full Name" class="username">
+        </div>
+
+        <p>Email</p>
+        <div class="user">
+          <i class="fa-solid fa-envelope"></i>
+          <input type="email" name="email" placeholder="Your Email" class="username">
+        </div>
+
+        <p class="passworg_tag">Password</p>
+        <div class="password">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" name="password" placeholder="Password">
+        </div>
+
+        <p>Confirm Password</p>
+        <div class="password">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" name="confirm_password" placeholder="Confirm Password">
+        </div>
+
+        <button type="submit">Register</button>
+
+        <p class="forget">Already have an account? <a href="login.ejs">Login here</a></p>
+
+        <div class="loging_icon">
+          <a href="#"><img src="/image/google.png" alt="Google"></a>
+          <a href="#"><img src="/image/facebook.png" alt="Facebook"></a>
+          <a href="#"><img src="/image/twitter.png" alt="Twitter"></a>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
