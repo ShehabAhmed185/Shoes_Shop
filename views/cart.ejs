@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cart</title>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    function updateTotal() {
+      const pricePerShoe = 100; // example price
+      const quantity = document.getElementById('quantity').value;
+      const total = quantity * pricePerShoe;
+      document.getElementById('totalPrice').innerText = `$${total}`;
+    }
+  </script>
+</head>
+<body>
+  <a href="/products.ejs" class="btn" style="display: inline-block; margin: 20px 0; background: linear-gradient(to right, #c72092 , #6c14d0); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">⬅ Back to Products</a>
+
+  <section class="login_form">
+    
+    <!-- <div class="left">
+      <img src="/image/shoes_cart.png" alt="Shoes Image">
+    </div> -->
+
+    <div class="right">
+      
+      <h1>Order Your Shoes</h1>
+
+      <form action="/submit-order" method="POST">
+        <p>How many shoes do you want?</p>
+        <div class="user">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <input 
+            type="number" 
+            name="quantity" 
+            id="quantity" 
+            class="username" 
+            placeholder="Enter quantity" 
+            min="1" 
+            value="1" 
+            oninput="updateTotal()" 
+            required
+          >
+        </div>
+
+        <p class="passworg_tag">Your Location</p>
+        <div class="password">
+          <i class="fa-solid fa-location-dot"></i>
+          <input 
+            type="text" 
+            name="location" 
+            placeholder="Enter your location" 
+            required
+          >
+        </div>
+
+        <p style="margin-top: 15px;">Total Price: <strong id="totalPrice">$100</strong></p>
+
+        <button type="submit">Submit Order</button>
+      </form>
+      
+    </div>
+  </section>
+
+  <script src="https://kit.fontawesome.com/a2d9d6ea2c.js" crossorigin="anonymous"></script>
+</body>
+</html>

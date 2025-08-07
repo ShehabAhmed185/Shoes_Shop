@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <section class="login_form">
+    <div class="right">
+      <h1>Your Invoice</h1>
+
+      <p><strong>Date:</strong> <%= order.date %></p>
+      <p><strong>Shipping Location:</strong> <%= order.location %></p>
+      <p><strong>Quantity:</strong> <%= order.quantity %></p>
+      <p><strong>Total Price:</strong> $<%= order.total %></p>
+
+      <h3 style="margin-top:20px;">Items:</h3>
+      <ul>
+        <% order.cart.forEach(product => { %>
+          <li><%= product.name %> - $<%= product.price %></li>
+        <% }) %>
+      </ul>
+
+      <a href="/products.ejs" class="btn" style="margin-top: 20px;">⬅ Back to Home</a>
+    </div>
+  </section>
+
+</body>
+</html>

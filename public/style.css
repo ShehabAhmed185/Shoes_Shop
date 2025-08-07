@@ -181,7 +181,7 @@ section .main .button:hover i{
 }
 
 .products h1{
-    margin: 35px 0;
+    margin: 95px 0;
     font-size: 60px;
     display: flex;
     align-items: center;
@@ -296,7 +296,7 @@ section .main .button:hover i{
 
 .about h1{
     font-size: 60px;
-    margin-top: 20px;
+    margin-top: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -412,7 +412,7 @@ section .main .button:hover i{
 }
 
 .review h1{
-    font-size: 60px;
+    font-size: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -511,7 +511,7 @@ section .main .button:hover i{
 }
 
 .services h1{
-    font-size: 60px;
+    font-size: 90px;
     text-transform: uppercase;
 }
 

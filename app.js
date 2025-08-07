@@ -2,11 +2,41 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const cusData = require("./models/mySchema");
+const productsData = require("./models/productSchema");
+const { render } = require('ejs');
 
 const app = express();
 const PORT = 3000;
-const pathDB = "mongodb://localhost:27017/MyData";
+const pathDB = "mongodb://localhost:27017/myDB";
 
+const products = [
+  { imgSrc: "shoes1.png", price: 100.99, stars: 5 },
+  { imgSrc: "shoes2.png", price: 200.99, stars: 4.5 },
+  { imgSrc: "shoes3.png", price: 175.99, stars: 3.5 },
+  { imgSrc: "shoes4.png", price: 120.99, stars: 4 },
+  { imgSrc: "shoes5.png", price: 150.99, stars: 5 },
+  { imgSrc: "shoes6.png", price: 220.99, stars: 4.5 },
+  { imgSrc: "shoes.png",  price: 110.99, stars: 3 },
+  { imgSrc: "shoes7.png", price: 150.99, stars: 4.5 }
+];
+const session = require('express-session');
+
+app.use(session({
+  secret: 'yourSecretKey', // غيّرها لأي كلمة سر
+  resave: false,
+  saveUninitialized: true,
+}));
+
+async function insertProducts() {
+  try {
+    await productsData.insertMany(products);
+    console.log('Products inserted successfully');
+    const data = productsData.find();
+    console.log(data)
+  } catch (error) {
+    console.error('Error inserting products:', error);
+  } 
+}
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -19,8 +49,18 @@ app.get('/', (req, res) => {
 app.get('/index.ejs', (req, res) => {
   res.render('index');
 });
-app.get('/products.ejs', (req, res) => {
-  res.render('products');
+app.get('/products.ejs', async (req, res) => {
+  try {
+    const products = await productsData.find().exec(); // Add .exec() to properly execute the query
+    // const customerData = await cusData.find().exec(); // Add .exec() to properly execute the query
+    // products.forEach(i =>{
+    //   console.log(i)
+    // });
+    res.render('products', { result: products });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server Error');
+  }
 });
 app.get('/about.ejs', (req, res) => {
   res.render('about');
@@ -38,6 +78,19 @@ app.get('/login.ejs', (req, res) => {
 app.get('/registration.ejs', (req, res) => {
   res.render('registration');
 });
+
+
+app.get("/cart/add/:productId", async (req, res) => {
+  console.log("Add to cart")
+  //  const cart = req.session.cart || [];
+//  return res.render('cart')
+  console.log(`id is ${req.params.productId}`)
+
+  res.render('cart',);
+
+})
+
+
 
 
 app.post('/register', async (req, res) => {
@@ -77,36 +130,59 @@ app.post('/login', async (req, res) => {
   try{
     const allData = await cusData.find();
     let count = 0;
+    let userID
    await allData.forEach(element =>{
-        if(element.name == req.body.name && element.password == req.body.password){
-          count++
+        if(element.email == req.body.email  && element.password == req.body.password){
+          count++;
+         userID= element._id;
         }
-    })
-    console.log(allData)
+    });
     if(count == 0)
         return res.send("WRONG USER NAME OR PASSWORD")
       else
-        return res.redirect('index')
+        return res.render('index',{userId:userID})
   }catch (err) {
     console.error(" Error:", err);
     res.status(500).send("Something went wrong!");
   }
 
-
-
 })
 
 
 
+app.post("/submit-order", (req, res) => {
+  const { quantity, location } = req.body;
+  const cart = req.session.cart || [];
+  const pricePerShoe = 100;
+  const total = quantity * pricePerShoe;
 
-mongoose.connect("mongodb://localhost:27017/myDB")
+  if (!req.session.orderTime) {
+    req.session.orderTime = new Date().toLocaleString(); 
+  }
+
+  const orderInfo = {
+    quantity: parseInt(quantity),
+    location,
+    total,
+    cart,
+    date: req.session.orderTime
+  };
+
+  res.render("invoice", { order: orderInfo });
+});
+
+
+
+
+
+mongoose.connect(pathDB)
   .then(() => {
     console.log("Connected to DB",mongoose.modelNames());
     app.listen(PORT, () => {
-      console.log(`✅ SERVER IS CONNECTED WITH PORT ${PORT}`);
-      console.log(`➡️ http://localhost:${PORT}`);
+      console.log(`SERVER IS CONNECTED WITH PORT ${PORT}`);
+      console.log(`http://localhost:${PORT}`);
     });
   })
   .catch((err) => {
-    console.log("❌ MongoDB Connection Error:", err);
+    console.log("MongoDB Connection Error:", err);
   });
