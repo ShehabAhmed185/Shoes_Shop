@@ -13,6 +13,7 @@
 
       <p><strong>Date:</strong> <%= order.date %></p>
       <p><strong>Shipping Location:</strong> <%= order.location %></p>
+      <p><strong>Phone Number:</strong> <%= order.phone %></p> <!-- ✅ تمت الإضافة -->
       <p><strong>Quantity:</strong> <%= order.quantity %></p>
       <p><strong>Total Price:</strong> $<%= order.total %></p>
 
@@ -23,7 +24,7 @@
         <% }) %>
       </ul>
 
-      <a href="/products.ejs" class="btn" style="margin-top: 20px;">⬅ Back to Home</a>
+      <a href="/products.ejs" class="btn" style="margin-top: 20px;">⬅ Back to Product</a>
     </div>
   </section>
 

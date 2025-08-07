@@ -5,8 +5,10 @@
   <title>Cart</title>
   <link rel="stylesheet" href="/style.css">
   <script>
+    // ✅ استخدام السعر المرسل من السيرفر
+    const pricePerShoe = <%= price %>;
+
     function updateTotal() {
-      const pricePerShoe = 100; // example price
       const quantity = document.getElementById('quantity').value;
       const total = quantity * pricePerShoe;
       document.getElementById('totalPrice').innerText = `$${total}`;
@@ -17,14 +19,11 @@
   <a href="/products.ejs" class="btn" style="display: inline-block; margin: 20px 0; background: linear-gradient(to right, #c72092 , #6c14d0); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">⬅ Back to Products</a>
 
   <section class="login_form">
-    
-    <!-- <div class="left">
-      <img src="/image/shoes_cart.png" alt="Shoes Image">
-    </div> -->
-
     <div class="right">
-      
       <h1>Order Your Shoes</h1>
+
+      <!-- ✅ عرض السعر الحقيقي للمنتج -->
+      <p><strong>Price per Shoe:</strong> $<%= price %></p>
 
       <form action="/submit-order" method="POST">
         <p>How many shoes do you want?</p>
@@ -54,11 +53,23 @@
           >
         </div>
 
-        <p style="margin-top: 15px;">Total Price: <strong id="totalPrice">$100</strong></p>
+        <p class="passworg_tag">Phone Number</p>
+        <div class="password">
+          <i class="fa-solid fa-phone"></i>
+          <input 
+            type="tel" 
+            name="phone" 
+            placeholder="Enter your phone number" 
+            pattern="[0-9]{10,15}" 
+            title="Enter a valid phone number"
+            required
+          >
+        </div>
+
+        <p style="margin-top: 15px;">Total Price: <strong id="totalPrice">$<%= price %></strong></p>
 
         <button type="submit">Submit Order</button>
       </form>
-      
     </div>
   </section>
 

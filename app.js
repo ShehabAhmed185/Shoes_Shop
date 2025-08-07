@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
   res.render('login');
 });
 app.get('/index.ejs', (req, res) => {
-  res.render('index');
+  res.render('index',{name:req.session.userName});
 });
 app.get('/products.ejs', async (req, res) => {
   try {
@@ -62,6 +62,8 @@ app.get('/products.ejs', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
+
 app.get('/about.ejs', (req, res) => {
   res.render('about');
 });
@@ -81,14 +83,22 @@ app.get('/registration.ejs', (req, res) => {
 
 
 app.get("/cart/add/:productId", async (req, res) => {
-  console.log("Add to cart")
+  try{
+    console.log("Add to cart")
   //  const cart = req.session.cart || [];
 //  return res.render('cart')
-  console.log(`id is ${req.params.productId}`)
-
-  res.render('cart',);
+  const id =req.params.productId
+  const proData = await productsData.findById(id);
+  console.log(`id is ${id}`)
+  const price = proData.price;
+  req.session.productID = id;
+  res.render('cart',{price});
+  }catch(err){
+    console.log(err)
+  }
 
 })
+
 
 
 
@@ -130,17 +140,25 @@ app.post('/login', async (req, res) => {
   try{
     const allData = await cusData.find();
     let count = 0;
-    let userID
+    let userID=null,name =null
    await allData.forEach(element =>{
         if(element.email == req.body.email  && element.password == req.body.password){
           count++;
          userID= element._id;
+         name =element.name
         }
     });
+    
+  if (userID&&name) {
+    req.session.userId= userID;
+    req.session.userName= name;
+  }
     if(count == 0)
         return res.send("WRONG USER NAME OR PASSWORD")
-      else
-        return res.render('index',{userId:userID})
+      else{
+        // req.session.quantity = 0;
+        return res.render('index',{name})
+      }
   }catch (err) {
     console.error(" Error:", err);
     res.status(500).send("Something went wrong!");
@@ -150,25 +168,31 @@ app.post('/login', async (req, res) => {
 
 
 
-app.post("/submit-order", (req, res) => {
-  const { quantity, location } = req.body;
+app.post("/submit-order",async (req, res) => {
+  try{
+  const { quantity, location,phone } = req.body;
   const cart = req.session.cart || [];
-  const pricePerShoe = 100;
+  const proData = await productsData.findById(req.session.productID);
+  const pricePerShoe = proData.price;
   const total = quantity * pricePerShoe;
 
   if (!req.session.orderTime) {
     req.session.orderTime = new Date().toLocaleString(); 
   }
-
+  
   const orderInfo = {
     quantity: parseInt(quantity),
     location,
+    phone,
     total,
     cart,
     date: req.session.orderTime
   };
 
   res.render("invoice", { order: orderInfo });
+}catch(err){
+  console.log(err)
+}
 });
 
 
