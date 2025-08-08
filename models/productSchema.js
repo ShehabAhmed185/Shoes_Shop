@@ -6,7 +6,8 @@ const ArticleScheme = new Schema({
    price:Number,
    stars:Number,
     name:String,
-    description:String
+    description:String,
+   quantity: Number 
 });
 
 const userData = mongDBB.model("productsData", ArticleScheme);

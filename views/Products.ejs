@@ -26,12 +26,25 @@
     </ul>
 
     <div class="icons">
-      <i class="fa-solid fa-heart"></i>
-      <i class="fa-solid fa-cart-shopping"></i>
-      <button onclick="window.location.href='login.ejs'" style="background: none; border: none; cursor: pointer;">
-        <i class="fa-solid fa-user"></i>
-      </button>
-    </div>
+  <i class="fa-solid fa-heart"></i>
+<%
+let x=0 ;
+ if(pID ==0){
+ x = 0 }
+ else{
+  x++
+ }%>
+<a href="/registration.ejs" class="cart-icon">
+  <i class="fa-solid fa-cart-shopping"></i>
+  <span id="cart-count"><%= x %></span>
+</a>
+
+  <button onclick="window.location.href='login.ejs'" style="background: none; border: none; cursor: pointer;">
+    <i class="fa-solid fa-user"></i>
+  </button>
+
+</div>
+
   </nav>
 
 <div class="products">
