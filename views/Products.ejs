@@ -27,14 +27,9 @@
 
     <div class="icons">
   <i class="fa-solid fa-heart"></i>
-<%
-let x=0 ;
- if(pID ==0){
- x = 0 }
- else{
-  x++
- }%>
-<a href="/registration.ejs" class="cart-icon">
+
+
+<a href="/build_cart" class="cart-icon">
   <i class="fa-solid fa-cart-shopping"></i>
   <span id="cart-count"><%= x %></span>
 </a>

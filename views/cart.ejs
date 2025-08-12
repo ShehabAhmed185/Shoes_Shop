@@ -3,75 +3,124 @@
 <head>
   <meta charset="UTF-8">
   <title>Cart</title>
-  <link rel="stylesheet" href="/style.css">
-  <script>
-    // ✅ استخدام السعر المرسل من السيرفر
-    const pricePerShoe = <%= price %>;
+  <link rel="stylesheet" href="/public/style.css">
 
+  <script>
     function updateTotal() {
-      const quantity = document.getElementById('quantity').value;
-      const total = quantity * pricePerShoe;
-      document.getElementById('totalPrice').innerText = `$${total}`;
+      const qtyEls = document.querySelectorAll('.product-quantity');
+      let total = 0;
+      qtyEls.forEach(el => {
+        const price = parseFloat(el.dataset.price) || 0;
+        const qty = parseInt(el.value) || 0;
+        total += price * qty;
+      });
+      document.getElementById('totalPrice').innerText = '$' + total.toFixed(2);
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.product-quantity').forEach(el => {
+        el.addEventListener('input', updateTotal);
+      });
+      updateTotal();
+    });
   </script>
+
+  <style>
+    .cart_section {
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .cart-item p {
+      margin: 0;
+    }
+    .form-group {
+      margin-top: 15px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+    button:hover {
+      background: #218838;
+    }
+  </style>
 </head>
 <body>
-  <a href="/products.ejs" class="btn" style="display: inline-block; margin: 20px 0; background: linear-gradient(to right, #c72092 , #6c14d0); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none;">⬅ Back to Products</a>
 
-  <section class="login_form">
-    <div class="right">
-      <h1>Order Your Shoes</h1>
+  <a href="/products" class="btn">⬅ Back to Products</a>
 
-      <p><strong>Price per Shoe:</strong> $<%= price %></p>
+  <section class="cart_section">
+    <h1>Your Cart</h1>
 
+    <% if (!sess || sess.length === 0) { %>
+      <p>Your cart is empty.</p>
+    <% } else { %>
       <form action="/submit-order" method="POST">
-        <p>How many shoes do you want?</p>
-        <div class="user">
-          <i class="fa-solid fa-cart-shopping"></i>
-          <input 
-            type="number" 
-            name="quantity" 
-            id="quantity" 
-            class="username" 
-            placeholder="Enter quantity" 
-            min="1" 
-            value="1" 
-            oninput="updateTotal()" 
-            required
-          >
+        <% sess.forEach((product, index) => { %>
+          <div class="cart-item">
+            <div>
+              <p><strong><%= product.name %></strong></p>
+              <p>Price: $<%= product.price.toFixed(2) %></p>
+            </div>
+            <div>
+              <input type="hidden" name="productIDs[]" value="<%= product.productID %>">
+              <label>
+                Qty:
+                <input
+                  type="number"
+                  name="quantities[]"
+                  class="product-quantity"
+                  min="1"
+                  value="<%= product.quantity || 1 %>"
+                  data-price="<%= product.price %>"
+                  required
+                  style="width:60px"
+                >
+              </label>
+            </div>
+          </div>
+        <% }) %>
+
+        <div class="form-group">
+          <label>Your Location:</label>
+          <input type="text" name="location" required placeholder="Enter your location">
         </div>
 
-        <p class="passworg_tag">Your Location</p>
-        <div class="password">
-          <i class="fa-solid fa-location-dot"></i>
-          <input 
-            type="text" 
-            name="location" 
-            placeholder="Enter your location" 
-            required
-          >
+        <div class="form-group">
+          <label>Phone Number:</label>
+          <input type="tel" name="phone" required placeholder="Enter phone" pattern="[0-9]{6,15}">
         </div>
 
-        <p class="passworg_tag">Phone Number</p>
-        <div class="password">
-          <i class="fa-solid fa-phone"></i>
-          <input 
-            type="tel" 
-            name="phone" 
-            placeholder="Enter your phone number" 
-            pattern="[0-9]{10,15}" 
-            title="Enter a valid phone number"
-            required
-          >
-        </div>
-
-        <p style="margin-top: 15px;">Total Price: <strong id="totalPrice">$<%= price %></strong></p>
+        <p style="margin-top: 12px; font-size: 18px;">
+          Total Price: <strong id="totalPrice">$0.00</strong>
+        </p>
 
         <button type="submit">Submit Order</button>
       </form>
-    </div>
+    <% } %>
   </section>
 
-  <script src="https://kit.fontawesome.com/a2d9d6ea2c.js" crossorigin="anonymous"></script>
 </body>
 </html>

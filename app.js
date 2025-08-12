@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cusData = require("./models/mySchema");
 const productsData = require("./models/productSchema");
 const { render } = require('ejs');
+const e = require('express');
 session = require('express-session');
 
 const app = express();
@@ -45,6 +46,7 @@ app.use(express.urlencoded({extended:true}))
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
+  req.session.count=0;
     // insertProducts();
   res.render('login');
 });
@@ -53,12 +55,8 @@ app.get('/index.ejs', (req, res) => {
 });
 app.get('/products.ejs', async (req, res) => {
   try {
-    const products = await productsData.find().exec(); // Add .exec() to properly execute the query
-    // const customerData = await cusData.find().exec(); // Add .exec() to properly execute the query
-    // products.forEach(i =>{
-    //   console.log(i)
-    // });
-    res.render('products', { result: products ,pID:0});
+    const products = await productsData.find().exec(); 
+    res.render('products', { result: products ,pID:0,x:0});
   } catch (error) {
     console.error(error);
     res.status(500).send('Server Error');
@@ -85,32 +83,43 @@ app.get('/registration.ejs', (req, res) => {
 
 
 app.get("/cart/add/:productId", async (req, res) => {
-  try{
-    console.log("Add to cart")
-  //  const cart = req.session.cart || [];
-//  return res.render('cart')
-  const id =req.params.productId
-  let arr =[]
-  const proData = await productsData.findById(id);
-  console.log(`id is ${id}`)
-  const price = proData.price;
-  req.session.productID = id;
-  let dataObj = {name:proData.name,price:proData.price}
-  arr.push(dataObj)
-  req.session.cart = arr
-  const products = await productsData.find().exec();
-  res.render('products', { result: products ,pID:id});
+  try {
+    const id = req.params.productId;
+    const proData = await productsData.findById(id);
 
-  // res.render('cart',{price});
+    if (!req.session.cart) req.session.cart = [];
 
-  }catch(err){
-    console.log(err)
+    const existingProduct = req.session.cart.find(p => p.productID === id);
+    if (existingProduct) {
+      existingProduct.quantity += 1; 
+    } else {
+      req.session.cart.push({
+        productID: id,
+        name: proData.name,
+        price: proData.price,
+        quantity: 1
+      });
+    }
+
+    req.session.count = (req.session.count || 0) + 1;
+
+    const products = await productsData.find().exec();
+    res.render('products', { result: products, pID: id, x: req.session.count });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Error adding to cart");
   }
-
 });
 
-
-
+app.get('/build_cart',async (req,res)=>{
+try{
+  const cart = req.session.cart || [];
+  // const id =req.session.id;
+  return  res.render('cart',{sess:cart});     
+}catch(err){
+  console.log(err)
+}
+});
 
 
 app.post('/register', async (req, res) => {
@@ -148,6 +157,7 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
 
   try{
+     
     const allData = await cusData.find();
     let count = 0;
     let userID=null,name =null
@@ -158,7 +168,7 @@ app.post('/login', async (req, res) => {
          name =element.name
         }
     });
-    
+   
   if (userID&&name) {
     req.session.userId= userID;
     req.session.userName= name;
@@ -180,43 +190,64 @@ app.post('/login', async (req, res) => {
 
 app.post("/submit-order",async (req, res) => {
   try{
-  const { quantity, location,phone } = req.body;
-  const cart = req.session.cart || [];
-  const id =req.session.productID;
-  const proData = await productsData.findById(id);
-  const pricePerShoe = proData.price;
-  const total = quantity * pricePerShoe;
-  const availableQuantity = proData.quantity;
-  if (availableQuantity < quantity) {
-   return res.send(`Sorry There are ${availableQuantity} Shoe /s Only`)
+   const { productIDs, quantities, location, phone } = req.body;
+
+    const orderItems = productIDs.map((id, index) => {
+      return {
+        productID: id,
+        quantity: parseInt(quantities[index], 10)
+      };
+    });
+    let total=0;
+    let nameOfPro=[]
+    let userQuan=[]
+    let priceOfPro=[]
+    for (let i = 0; i < orderItems.length; i++) {
+      const proData = await productsData.findById(orderItems[i].productID);
+      const pricePerShoe = proData.price;
+      nameOfPro.push(proData.name)
+      priceOfPro.push(proData.price)
+       total +=orderItems[i].quantity * pricePerShoe;
+      const availableQuantity = proData.quantity;
+      userQuan.push(orderItems[i].quantity)
+      if (availableQuantity < orderItems[i].quantity) {
+         orderItems[i].quantity = availableQuantity;
+      return res.send(`Sorry There are ${availableQuantity} Shoe /s Only`)
+      }else{
+        const updatedProduct = await productsData.findByIdAndUpdate(
+              orderItems[i].productID,
+              { $inc: { quantity: -(orderItems[i].quantity) } }, // Decreases stock
+              { new: true }
+            );
+            if(!updatedProduct)
+              res.send("DB IS NOT UPDATED");
+
+              console.log(orderItems[i].productID)
+              
+            }
+      }//end of for lloop
+
+        if (!req.session.orderTime) 
+            req.session.orderTime = new Date().toLocaleString(); 
+        
+        const orderInfo = {
+         nameOfPro,
+         userQuan,
+         priceOfPro,
+          location,
+          phone,
+          total,
+          date: req.session.orderTime
+        }
+      req.session.destroy(err => {
+              if (err) console.log("Error destroying session:", err);
+            });
+          res.render("invoice", { order: orderInfo });
+  
+  }catch(err){
+    console.log(err);
   }
-  if (!req.session.orderTime) {
-    req.session.orderTime = new Date().toLocaleString(); 
-  }
-    
-  const orderInfo = {
-    quantity: parseInt(quantity),
-    location,
-    phone,
-    total,
-    cart,
-    date: req.session.orderTime
-  };
-  console.log(proData.quantity)
-     const updatedProduct = await productsData.findByIdAndUpdate(
-      id,
-      { $inc: { quantity: -quantity } }, // Decreases stock
-      { new: true }
-    );
-    if(!updatedProduct)
-      res.send("DB IS NOT UPDATED");
 
-
-
-  res.render("invoice", { order: orderInfo });
-}catch(err){
-  console.log(err)
-}
 });
 
 
