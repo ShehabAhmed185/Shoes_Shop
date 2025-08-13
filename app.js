@@ -3,6 +3,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const cusData = require("./models/mySchema");
 const productsData = require("./models/productSchema");
+const userReview = require("./models/userReviewSchema");
 const { render } = require('ejs');
 const e = require('express');
 session = require('express-session');
@@ -67,9 +68,9 @@ app.get('/products.ejs', async (req, res) => {
 app.get('/about.ejs', (req, res) => {
   res.render('about');
 });
-app.get('/review.ejs', (req, res) => {
-  res.render('review');
-});
+// app.get('/review.ejs', (req, res) => {
+//   res.render('review');
+// });
 
 app.get('/services.ejs', (req, res) => {
   res.render('services');
@@ -250,6 +251,31 @@ app.post("/submit-order",async (req, res) => {
 
 });
 
+
+app.get("/review.ejs",async(req,res)=>{
+  try{
+     const allReviews = await userReview.find().sort({ _id: -1 }); 
+    res.render("review", { reviews: allReviews });
+  }catch(err){
+    console.log(err)
+  }
+});
+
+app.post("/userReview",async(req,res)=>{
+  try{
+    const id =  req.session.userId
+    console.log(id);
+    const article = new userReview({
+    userID: id,      
+    ...req.body 
+  });
+    await article.save();
+     const allReviews = await userReview.find().sort({ _id: -1 }); 
+    res.redirect("/review.ejs");
+  }catch(err){
+    console.log(err)
+  }
+})
 
 
 

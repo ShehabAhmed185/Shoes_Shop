@@ -6,10 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Customer Reviews</title>
 
-  <!-- ✅ CSS -->
   <link rel="stylesheet" href="/style.css">
 
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
 <body>
@@ -29,66 +27,51 @@
     <div class="icons">
       <i class="fa-solid fa-heart"></i>
       <i class="fa-solid fa-cart-shopping"></i>
-      <button onclick="window.location.href='login.ejs'" style="background: none; border: none; cursor: pointer;">
-        <i class="fa-solid fa-user"></i>
+    <button onclick="window.location.href='Login.ejs'" style="background: none; border: none; cursor: pointer;">
+          <i class="fa-solid fa-user"></i>
       </button>
     </div>
   </nav>
 
   <div class="review">
-    <h1>Customer's<span>review</span></h1>
+    <h1>Customer's <span>Review</span></h1>
+
+    <!-- ✅ Form to Add Review -->
+    <div class="review_form" style="margin-bottom: 30px;">
+      <form action="/userReview" method="POST" style="display: flex; flex-direction: column; gap: 10px; max-width: 500px; margin: auto;">
+        <textarea name="review" placeholder="Write your review here..." rows="4" required style="padding: 10px;"></textarea>
+        <button type="submit" style="padding: 10px; background: #333; color: #fff; cursor: pointer;">Submit Review</button>
+      </form>
+    </div>
 
     <div class="review_box">
-      <div class="review_card">
-        <div class="card_top">
-          <div class="profile">
-            <div class="profile_image">
-              <img src="/image/girl_dp1.jpg" alt="User">
-            </div>
-            <div class="name">
-              <strong>Ranidi Lochana</strong>
-              <div class="like">
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star-half-stroke"></i>
+      <% if (reviews && reviews.length > 0) { %>
+        <% reviews.forEach(r => { %>
+          <div class="review_card">
+            <div class="card_top">
+              <div class="profile">
+                
+                <div class="name">
+                  <strong>User ID: <%= r.userID %></strong>
+                  <div class="like">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-regular fa-star"></i>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="comment">
-          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit...</p>
-        </div>
-      </div>
-
-      <!-- باقي الكروت هنا بنفس الشكل المعدل -->
-      <div class="review_card">
-        <div class="card_top">
-          <div class="profile">
-            <div class="profile_image">
-              <img src="/image/man_dp1.jpg" alt="User">
-            </div>
-            <div class="name">
-              <strong>Sayuru Tharanga</strong>
-              <div class="like">
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star-half-stroke"></i>
-                <i class="fa-regular fa-star"></i>
-              </div>
+            <div class="comment">
+              <p><%= r.review %></p>
+              <small><%= r.curDate %></small>
             </div>
           </div>
-        </div>
-        <div class="comment">
-          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit...</p>
-        </div>
-      </div>
-
-      <!-- كمل باقي الكروت بنفس التعديل -->
-      <!-- كل الصور تعدلها إلى: /image/filename.jpg -->
-
+        <% }) %>
+      <% } else { %>
+        <p style="text-align: center;">No reviews yet. Be the first to add one!</p>
+      <% } %>
     </div>
   </div>
 </body>
