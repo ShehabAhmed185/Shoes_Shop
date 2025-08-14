@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <style>
+        .error-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #ff6b6b;
+            border-radius: 5px;
+            background-color: #fff5f5;
+        }
+        .error-message {
+            color: #d33;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .btn-return {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4a89dc;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .btn-return:hover {
+            background-color: #3b7dd8;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-message">
+            <%= message %>
+        </div>
+        <a href="<%= returnUrl || '/' %>" class="btn-return">
+            <%= returnUrl ? 'Go Back' : 'Return to Home' %>
+        </a>
+    </div>
+</body>
+</html>

@@ -3,6 +3,7 @@ const Schema = mongDBB.Schema;
 
 const ArticleScheme = new Schema({
     userID:String,
+    userName:String,
     review:String,
     curDate: {
         type: String,

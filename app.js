@@ -68,9 +68,7 @@ app.get('/products.ejs', async (req, res) => {
 app.get('/about.ejs', (req, res) => {
   res.render('about');
 });
-// app.get('/review.ejs', (req, res) => {
-//   res.render('review');
-// });
+
 
 app.get('/services.ejs', (req, res) => {
   res.render('services');
@@ -81,6 +79,12 @@ app.get('/login.ejs', (req, res) => {
 app.get('/registration.ejs', (req, res) => {
   res.render('registration');
 });
+
+
+app.get("/add_to_favourite",(req,res)=>{
+  const id = req.session.userId;
+  console.log(id)
+})
 
 
 app.get("/cart/add/:productId", async (req, res) => {
@@ -121,6 +125,17 @@ try{
   console.log(err)
 }
 });
+
+
+
+app.get("/Destroy_Cart",(req,res)=>{
+  req.session.destroy(err => {
+        if (err) console.log("Error destroying session:", err);
+    });
+  const cart = [];
+  return  res.render('cart',{sess:cart});   
+});
+
 
 
 app.post('/register', async (req, res) => {
@@ -213,7 +228,17 @@ app.post("/submit-order",async (req, res) => {
       userQuan.push(orderItems[i].quantity)
       if (availableQuantity < orderItems[i].quantity) {
          orderItems[i].quantity = availableQuantity;
-      return res.send(`Sorry There are ${availableQuantity} Shoe /s Only`)
+      //  res.send(`Sorry There are ${availableQuantity} Shoe /s Only`)
+      let message;
+      let returnUrl ="Products.ejs"
+      if(availableQuantity == 0)
+         message = `Sorry this product not available`
+      else
+         message = `Sorry There are ${availableQuantity} Shoe /s Only`
+          req.session.destroy(err => {
+        if (err) console.log("Error destroying session:", err);
+    });
+       return res.render("error",{message,returnUrl})
       }else{
         const updatedProduct = await productsData.findByIdAndUpdate(
               orderItems[i].productID,
@@ -255,6 +280,7 @@ app.post("/submit-order",async (req, res) => {
 app.get("/review.ejs",async(req,res)=>{
   try{
      const allReviews = await userReview.find().sort({ _id: -1 }); 
+     console.log(allReviews.userID)
     res.render("review", { reviews: allReviews });
   }catch(err){
     console.log(err)
@@ -265,8 +291,10 @@ app.post("/userReview",async(req,res)=>{
   try{
     const id =  req.session.userId
     console.log(id);
+    const customerData = await cusData.findById(id);
     const article = new userReview({
-    userID: id,      
+    userID: id,   
+    userName: customerData.name,   
     ...req.body 
   });
     await article.save();
