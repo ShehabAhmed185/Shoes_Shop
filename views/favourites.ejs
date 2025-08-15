@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nike Products</title>
+
+  <link rel="stylesheet" href="/style.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+
+  <nav>
+    <div class="logo">
+      <h1>your favourite<span>s</span></h1>
+    </div>
+
+    <ul>
+      <li><a href="index.ejs">Home</a></li>
+      <li><a href="products.ejs">Products</a></li>
+      <li><a href="about.ejs">About</a></li>
+      <li><a href="review.ejs">Review</a></li>
+      <li><a href="services.ejs">Services</a></li>
+    </ul>
+
+    <div class="icons">
+
+    <a href="/build_cart" class="cart-icon">
+    <i class="fa-solid fa-cart-shopping"></i>
+    <span id="cart-count"><%= x %></span>
+    </a>
+
+  <button onclick="window.location.href='login.ejs'" style="background: none; border: none; cursor: pointer;">
+    <i class="fa-solid fa-user"></i>
+  </button>
+
+</div>
+
+  </nav>
+
+<div class="products">
+  <h1>Products</h1>
+  <div class="box">
+    <% result.forEach(product => { %>
+      <div class="card">
+        <div class="small_card">
+          <i class="fa-solid fa-share"></i>
+        </div>
+        <div class="image">
+          <img src="/image/<%= product.imgSrc %>" alt="Nike Product">
+        </div>
+        <div class="products_text">
+          <h2><%= product.name %></h2>
+          <p><%= product.description %></p>
+          <h3>$<%= product.price.toFixed(2) %></h3>
+          <div class="products_star">
+            <% for (let i = 1; i <= 5; i++) { %>
+              <% if (product.stars >= i) { %>
+                <i class="fa-solid fa-star"></i>
+              <% } else if (product.stars >= i - 0.5) { %>
+                <i class="fa-solid fa-star-half-stroke"></i>
+              <% } else { %>
+                <i class="fa-regular fa-star"></i>
+              <% } %>
+            <% } %>
+          </div>
+         <a href="/cart/add/<%= product._id %>" class="btn">Add To Cart</a>
+        </div>
+      </div>
+    <% }); %>
+    <div class="button">
+    <a href="/Destroy_Favourites">Delete Favourites</a>
+</div>
+  </div>
+</div>
+
+</body>
+</html>

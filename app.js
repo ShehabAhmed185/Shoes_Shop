@@ -46,6 +46,10 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({extended:true}))
 app.use(express.static(path.join(__dirname, 'public')));
 
+let user_ID;
+let productIDsToFavourits=[];
+
+
 app.get('/', (req, res) => {
   req.session.count=0;
     // insertProducts();
@@ -54,15 +58,19 @@ app.get('/', (req, res) => {
 app.get('/index.ejs', (req, res) => {
   res.render('index',{name:req.session.userName});
 });
+
+
 app.get('/products.ejs', async (req, res) => {
   try {
     const products = await productsData.find().exec(); 
-    res.render('products', { result: products ,pID:0,x:0});
+    res.render('products', { result: products ,pID:0,x:(req.session.count || 0)});
   } catch (error) {
     console.error(error);
     res.status(500).send('Server Error');
   }
 });
+
+
 
 
 app.get('/about.ejs', (req, res) => {
@@ -81,9 +89,44 @@ app.get('/registration.ejs', (req, res) => {
 });
 
 
-app.get("/add_to_favourite",(req,res)=>{
-  const id = req.session.userId;
-  console.log(id)
+app.get("/add_to_favourite/:productId",async(req,res)=>{
+ try {
+   const id = user_ID;
+  const productID = req.params.productId;
+  productIDsToFavourits.push(productID);
+ 
+   const products = await productsData.find().exec();
+    res.render('products', { result: products, pID: id, x: (req.session.count || 0)});
+ }catch (err) {
+  console.log(err)
+ }
+});
+
+app.get("/favourites", async(req,res)=>{
+  let product =[];
+  for (let i = 0; i < productIDsToFavourits.length; i++) {
+     const prod = await productsData.findById(productIDsToFavourits[i]);
+     product.push(prod);
+  }
+  if(product.length==0){
+    const message = "No favourites exist"
+    let returnUrl ="Products.ejs"
+    return res.render("error",{message,returnUrl})
+  }else{
+    res.render('favourites', { result: product, pID: user_ID, x:( req.session.count ||0)});
+  }
+
+
+});
+
+app.get("/Destroy_Favourites",async(req,res)=>{
+ try {
+   productIDsToFavourits =[]
+   const products = await productsData.find().exec();
+    res.render('products', { result: products, pID: user_ID, x: (req.session.count||0) });
+ } catch (error) {
+  console.log(error)
+ }
 })
 
 
@@ -128,16 +171,19 @@ try{
 
 
 
-app.get("/Destroy_Cart",(req,res)=>{
-  req.session.destroy(err => {
-        if (err) console.log("Error destroying session:", err);
-    });
-  const cart = [];
-  return  res.render('cart',{sess:cart});   
+app.get("/Destroy_Cart",async(req,res)=>{
+  try{
+       req.session.cart = [];
+      const cart = [];
+    const products = await productsData.find().exec();
+    req.session.count = 0
+      res.render('products', { result: products, pID: user_ID, x: (  req.session.count || 0) });
+  }catch(err){
+    console.log(err)
+  }
 });
 
-
-
+const bcrypt = require('bcrypt');
 app.post('/register', async (req, res) => {
     if(req.body.password != req.body.confirm_password){
       res.send("Passwords do not match")
@@ -145,21 +191,29 @@ app.post('/register', async (req, res) => {
   try {
     let count = 0;
     const allData = await cusData.find();
+    const {name , email , password} = req.body
+
     allData.forEach(element => {
-      if(req.body.email == element.email){
+      if(email == element.email){
         count++
        return res.send("THIS EMAIL IS ALREADY EXIST")
       }
-      if(req.body.password == element.password){
+      if(password == element.password){
         count++
        return res.send("THIS PASSWORD IS ALREADY EXIST")
       }
     })
    
     console.log("Data is received");
-    console.log(req.body);
+
+
+    const hashedPassword = await bcrypt.hash(password, 10);
     if(count == 0 ){
-      const article = new cusData(req.body);
+      const article = new cusData({
+        name,
+        email,
+        password:hashedPassword
+      });
       await article.save();
       res.redirect("/");
     }
@@ -171,36 +225,38 @@ app.post('/register', async (req, res) => {
 
 
 app.post('/login', async (req, res) => {
-
-  try{
-     
+  try {
     const allData = await cusData.find();
     let count = 0;
-    let userID=null,name =null
-   await allData.forEach(element =>{
-        if(element.email == req.body.email  && element.password == req.body.password){
-          count++;
-         userID= element._id;
-         name =element.name
-        }
-    });
-   
-  if (userID&&name) {
-    req.session.userId= userID;
-    req.session.userName= name;
-  }
-    if(count == 0)
-        return res.send("WRONG USER NAME OR PASSWORD")
-      else{
-        // req.session.quantity = 0;
-        return res.render('index',{name})
+    let userID = null, name = null;
+
+    for (const element of allData) {
+      const isMatch = await bcrypt.compare(req.body.password, element.password);
+
+      if (element.email === req.body.email && isMatch) {
+        count++;
+        userID = element._id;
+        name = element.name;
+        break; 
       }
-  }catch (err) {
-    console.error(" Error:", err);
+    }
+
+    if (userID && name) {
+      req.session.userId = userID;
+      req.session.userName = name;
+    }
+
+    if (count === 0) {
+      return res.send("WRONG USER NAME OR PASSWORD");
+    } else {
+      return res.render('index', { name });
+    }
+  } catch (err) {
+    console.error("Error:", err);
     res.status(500).send("Something went wrong!");
   }
+});
 
-})
 
 
 

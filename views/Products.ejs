@@ -26,7 +26,7 @@
     </ul>
 
     <div class="icons">
-<a href="/add_to_favourite" aria-label="Go to wishlist" class="heart-link">
+<a href="/favourites" aria-label="Go to wishlist" class="heart-link">
   <i class="fa-solid fa-heart"></i>
 </a>
 
@@ -55,9 +55,21 @@
   <h1>Products</h1>
   <div class="box">
     <% result.forEach(product => { %>
+      <% if (product.quantity >0) { %>
+       
+    
       <div class="card">
         <div class="small_card">
+        <a href="/add_to_favourite/<%= product._id %>" aria-label="Go to wishlist" class="heart-link">
           <i class="fa-solid fa-heart"></i>
+        </a>
+
+        <style>
+          .heart-link i {
+            color: black;
+          }
+        </style>
+
           <i class="fa-solid fa-share"></i>
         </div>
         <div class="image">
@@ -81,6 +93,7 @@
          <a href="/cart/add/<%= product._id %>" class="btn">Add To Cart</a>
         </div>
       </div>
+      <% } %>
     <% }); %>
   </div>
 </div>
