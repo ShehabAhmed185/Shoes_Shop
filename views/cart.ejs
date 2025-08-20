@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cart</title>
+  <link rel="stylesheet" href="/public/style.css">
+
+  <script>
+    function updateTotal() {
+      const qtyEls = document.querySelectorAll('.product-quantity');
+      let total = 0;
+      qtyEls.forEach(el => {
+        const price = parseFloat(el.dataset.price) || 0;
+        const qty = parseInt(el.value) || 0;
+        total += price * qty;
+      });
+      document.getElementById('totalPrice').innerText = '$' + total.toFixed(2);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.product-quantity').forEach(el => {
+        el.addEventListener('input', updateTotal);
+      });
+      updateTotal();
+    });
+  </script>
+
+  <style>
+    .cart_section {
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .cart-item p {
+      margin: 0;
+    }
+    .form-group {
+      margin-top: 15px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+    button:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="products.ejs" class="btn">⬅ Back to Products</a>
+
+  <section class="cart_section">
+    <h1>Your Cart</h1>
+
+    <% if (!sess || sess.length === 0) { %>
+      <p>Your cart is empty.</p>
+    <% } else { %>
+      <form action="/submit-order" method="POST">
+        <% sess.forEach((product, index) => { %>
+          <div class="cart-item">
+            <div>
+              <p><strong><%= product.name %></strong></p>
+              <p>Price: $<%= product.price.toFixed(2) %></p>
+            </div>
+            <div>
+              <input type="hidden" name="productIDs[]" value="<%= product.productID %>">
+              <label>
+                Qty:
+                <input
+                  type="number"
+                  name="quantities[]"
+                  class="product-quantity"
+                  min="1"
+                  value="<%= product.quantity || 1 %>"
+                  data-price="<%= product.price %>"
+                  required
+                  style="width:60px"
+                >
+              </label>
+            </div>
+          </div>
+        <% }) %>
+
+        <div class="form-group">
+          <label>Your Location:</label>
+          <input type="text" name="location" required placeholder="Enter your location">
+        </div>
+
+        <div class="form-group">
+          <label>Phone Number:</label>
+          <input type="tel" name="phone" required placeholder="Enter phone" pattern="[0-9]{6,15}">
+        </div>
+
+        <p style="margin-top: 12px; font-size: 18px;">
+          Total Price: <strong id="totalPrice">$0.00</strong>
+        </p>
+
+        <button type="submit">Submit Order</button>
+      </form>
+    <% } %>
+      
+     
+  </section>
+ <div class="button">
+                <a href="/Destroy_Cart">Delete Cart</a>
+            </div>
+</body>
+</html>

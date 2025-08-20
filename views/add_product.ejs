@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Products</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 20px; min-height: 100vh; color: #333; line-height: 1.6; }
+    .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); overflow: hidden; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%); color: white; }
+    .home-btn { display: inline-flex; align-items: center; padding: 10px 20px; background-color: rgba(255, 255, 255, 0.2); color: white; text-decoration: none; border-radius: 6px; font-weight: 500; transition: background-color 0.3s; }
+    .home-btn:hover { background-color: rgba(255, 255, 255, 0.3); }
+    h1 { text-align: center; margin: 30px 0; color: #2c3e50; font-size: 2.5rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+    .form-container { display: flex; flex-wrap: wrap; gap: 30px; padding: 0 30px 30px; }
+    .form-panel,.preview-panel { flex: 1; min-width: 350px; background: #f8f9fa; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .form-title { font-size: 1.5rem; margin-bottom: 20px; color: #2c3e50; padding-bottom: 10px; border-bottom: 2px solid #dee2e6; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; color: #495057; }
+    input, select, button { width: 100%; padding: 12px 15px; margin: 8px 0; border: 1px solid #ced4da; border-radius: 8px; font-size: 1rem; transition: all 0.3s; }
+    input:focus, select:focus { outline: none; border-color: #4b6cb7; box-shadow: 0 0 0 3px rgba(75, 108, 183, 0.25); }
+    button { background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%); color: white; border: none; cursor: pointer; font-weight: 600; padding: 14px; margin-top: 10px; }
+    button:hover { opacity: 0.9; transform: translateY(-2px); }
+    .save-btn { background: linear-gradient(90deg, #2ecc71 0%, #27ae60 100%); }
+    .clear-btn { background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%); }
+    .products-list { margin-top: 30px; max-height: 400px; overflow-y: auto; padding-right: 10px; }
+    .product-card { display: flex; align-items: center; background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s; }
+    .product-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .product-image { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; margin-right: 20px; border: 1px solid #dee2e6; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #6c757d; text-align: center; padding: 5px; }
+    .product-info { flex-grow: 1; }
+    .product-name { font-weight: 600; font-size: 1.1rem; color: #2c3e50; }
+    .product-details { color: #6c757d; margin-top: 5px; }
+    .stars { color: #ffc107; letter-spacing: 3px; margin: 5px 0; }
+    .empty-state { text-align: center; padding: 30px; color: #6c757d; background-color: #f8f9fa; border-radius: 10px; border: 2px dashed #dee2e6; }
+    .button-group { display: flex; gap: 15px; margin-top: 20px; }
+    .button-group button { width: auto; flex: 1; }
+    .notification { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 8px; background: #2ecc71; color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transform: translateX(100%); opacity: 0; transition: transform 0.5s, opacity 0.5s; z-index: 1000; }
+    .notification.show { transform: translateX(0); opacity: 1; }
+    .file-upload { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+    .file-upload-btn { background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%); color: white; padding: 12px 20px; border-radius: 8px; text-align: center; cursor: pointer; display: block; margin-top: 8px; }
+    .file-upload input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+    @media (max-width: 768px) {
+      .form-container { flex-direction: column; }
+      .product-card { flex-direction: column; text-align: center; }
+      .product-image { margin-right: 0; margin-bottom: 15px; }
+      .topbar { flex-direction: column; gap: 15px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <a class="home-btn" href="/indexAdmin"><i class="fas fa-arrow-left"></i> Back to Home</a>
+      <h1>Add New Products</h1>
+      <div></div>
+    </div>
+
+    <div class="form-container">
+      <div class="form-panel">
+        <h2 class="form-title"><i class="fas fa-plus-circle"></i> Product Details</h2>
+
+        <!-- We DON'T post this form directly; we only use it to add to local list -->
+        <form id="productForm" novalidate>
+          <div class="form-group">
+            <label for="imgSrc">Product Image</label>
+            <div class="file-upload">
+              <div class="file-upload-btn">Choose Image File</div>
+              <input type="file" id="imgSrc" accept="image/*">
+            </div>
+            <small style="color:#6c757d;display:block;margin-top:6px;">
+              Preview uses the local file; DB will store only the filename path (no upload).
+              Place the image in <code>/public/images/products/</code> with the same filename.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="name">Product Name</label>
+            <input type="text" id="name" placeholder="Enter product name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="price">Price ($)</label>
+            <input type="number" step="0.01" id="price" placeholder="Enter price" required>
+          </div>
+
+          <div class="form-group">
+            <label for="stars">Rating</label>
+            <select id="stars" required>
+              <option value="">Select rating</option>
+              <option value="5">★★★★★ (5)</option>
+              <option value="4">★★★★☆ (4)</option>
+              <option value="3">★★★☆☆ (3)</option>
+              <option value="2">★★☆☆☆ (2)</option>
+              <option value="1">★☆☆☆☆ (1)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" placeholder="Enter quantity" required>
+          </div>
+
+          <button type="submit"><i class="fas fa-plus"></i> Add Product</button>
+        </form>
+      </div>
+
+      <div class="preview-panel">
+        <h2 class="form-title"><i class="fas fa-eye"></i> Product Preview</h2>
+        <div class="products-list" id="productsList">
+          <div class="empty-state">
+            <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 15px;"></i>
+            <h3>No Products Added Yet</h3>
+            <p>Add products using the form to see them here</p>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="save-btn" onclick="saveProducts()"><i class="fas fa-save"></i> Save All Products</button>
+          <button type="button" class="clear-btn" onclick="clearAllProducts()"><i class="fas fa-trash"></i> Clear All</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notification" id="notification">
+    <i class="fas fa-check-circle"></i> <span id="notification-text"></span>
+  </div>
+
+  <script>
+    // Keep a local working list
+    const products = JSON.parse(localStorage.getItem('products') || '[]');
+
+    const placeholderSVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f8f9fa'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='14' fill='%236c757d'%3ENo Image%3C/text%3E%3C/svg%3E";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderProducts();
+
+      const fileInput = document.getElementById('imgSrc');
+      const fileUploadBtn = document.querySelector('.file-upload-btn');
+
+      fileInput.addEventListener('change', function () {
+        fileUploadBtn.textContent = this.files.length > 0 ? this.files[0].name : 'Choose Image File';
+      });
+    });
+
+    document.getElementById("productForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const imgInput = document.getElementById("imgSrc");
+      const nameEl = document.getElementById("name");
+      const priceEl = document.getElementById("price");
+      const starsEl = document.getElementById("stars");
+      const qtyEl = document.getElementById("quantity");
+
+      if (!nameEl.value || !priceEl.value || !starsEl.value || !qtyEl.value) {
+        showNotification('Please fill all fields', 'error');
+        return;
+      }
+
+      const file = imgInput.files && imgInput.files[0] ? imgInput.files[0] : null;
+
+      // Local preview for UI only
+      const imgPreview = file ? URL.createObjectURL(file) : placeholderSVG;
+
+      // What we store in DB: filename-based static path (no multer)
+      // Put your images in: public/images/products/<filename>
+      const filename = file ? file.name : '';
+      const imgSrcForDB = filename ? `/images/products/${filename}` : '';
+
+      const newProduct = {
+        id: Date.now(),
+        name: nameEl.value.trim(),
+        price: Number(priceEl.value),
+        stars: Number(starsEl.value),
+        quantity: Number(qtyEl.value),
+        imgPreview,        // used ONLY for preview
+        imgSrc: imgSrcForDB // this is what will be sent to DB
+      };
+
+      products.push(newProduct);
+      localStorage.setItem('products', JSON.stringify(products));
+      renderProducts();
+      showNotification('Product added successfully!');
+      this.reset();
+      document.querySelector('.file-upload-btn').textContent = 'Choose Image File';
+    });
+
+    function renderProducts() {
+      const list = document.getElementById("productsList");
+      if (!products.length) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 15px;"></i>
+            <h3>No Products Added Yet</h3>
+            <p>Add products using the form to see them here</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = "";
+      products.forEach((p) => {
+        const s = Number(p.stars) || 0;
+        const starsHTML = '★'.repeat(Math.min(5, s)) + '☆'.repeat(Math.max(0, 5 - s));
+
+        list.innerHTML += `
+          <div class="product-card" data-id="${p.id}">
+            <img class="product-image" src="${p.imgPreview || '${placeholderSVG}'}" alt="${escapeHtml(p.name)}">
+            <div class="product-info">
+              <div class="product-name">${escapeHtml(p.name)}</div>
+              <div class="stars">${starsHTML}</div>
+              <div class="product-details">
+                Price: $${Number(p.price).toFixed(2)} | Quantity: ${Number(p.quantity)}
+              </div>
+              ${p.imgSrc ? `<div class="product-details" style="font-size:.9rem;color:#999">Stored path: ${escapeHtml(p.imgSrc)}</div>` : ''}
+            </div>
+            <button onclick="removeProduct(${p.id})" style="width: auto; padding: 8px 12px;"><i class="fas fa-times"></i></button>
+          </div>
+        `;
+      });
+    }
+
+    function removeProduct(id) {
+      const idx = products.findIndex(p => p.id === id);
+      if (idx !== -1) {
+        products.splice(idx, 1);
+        localStorage.setItem('products', JSON.stringify(products));
+        renderProducts();
+        showNotification('Product removed!');
+      }
+    }
+
+    function clearAllProducts() {
+      if (!products.length) return;
+      if (confirm("Are you sure you want to remove all products?")) {
+        products.length = 0;
+        localStorage.removeItem('products');
+        renderProducts();
+        showNotification('All products cleared!');
+      }
+    }
+
+    function saveProducts() {
+      if (!products.length) {
+        showNotification('No products to save!', 'error');
+        return;
+      }
+
+      // Only send the fields the backend needs (no blob preview)
+      const toSave = products.map(({ name, price, stars, quantity, imgSrc }) => ({
+        name, price, stars, quantity, imgSrc
+      }));
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/saveProduct';
+
+      const productsInput = document.createElement('input');
+      productsInput.type = 'hidden';
+      productsInput.name = 'products';
+      productsInput.value = JSON.stringify(toSave);
+      form.appendChild(productsInput);
+
+      document.body.appendChild(form);
+      form.submit();
+    }
+
+    function showNotification(message, type = 'success') {
+      const el = document.getElementById('notification');
+      const txt = document.getElementById('notification-text');
+      txt.textContent = message;
+      el.style.background = type === 'success' ? '#2ecc71' : '#e74c3c';
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    // Simple HTML escaper for names/paths in template strings
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
