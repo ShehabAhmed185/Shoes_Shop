@@ -4,9 +4,9 @@ const mongoose = require('mongoose');
 const cusData = require("./models/mySchema");
 const productsData = require("./models/productSchema");
 const userReview = require("./models/userReviewSchema");
+const profitsData = require("./models/calcProfitsSchema");
 const session = require('express-session');
 const bcrypt = require('bcrypt');
-
 const app = express();
 const PORT = 3000;
 const pathDB = "mongodb://localhost:27017/myDB";
@@ -30,7 +30,7 @@ app.use(session({
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -48,7 +48,7 @@ app.get('/index.ejs', (req, res) => {
 app.get('/products.ejs', async (req, res) => {
   try {
     const products = await productsData.find().exec();
-    res.render('products', { result: products, pID: req.session.userId || 0, x: (req.session.count || 0) });
+    res.render('products', { result: products, x: (req.session.count || 0) });
   } catch (error) {
     res.status(500).send('Server Error');
   }
@@ -67,7 +67,7 @@ app.get("/add_to_favourite/:productId", async (req, res) => {
       req.session.productIDsToFavourits.push(productID);
     }
     const products = await productsData.find().exec();
-    res.render('products', { result: products, pID: req.session.userId, x: (req.session.count || 0) });
+    res.render('products', { result: products, x: (req.session.count || 0) });
   } catch (err) {
     res.status(500).send("Error adding to favourites");
   }
@@ -83,7 +83,7 @@ try {
     const prod = await productsData.findById(id);
     if (prod) productList.push(prod);
   }
-  res.render('favourites', { result: productList, pID: req.session.userId, x: (req.session.count || 0) });
+  res.render('favourites', { result: productList, x: (req.session.count || 0) });
 
 } catch (error) {
     console.log(error)
@@ -109,7 +109,7 @@ app.get("/cart/add/:productId", async (req, res) => {
     }
     req.session.count = (req.session.count || 0) + 1;
     const products = await productsData.find().exec();
-    res.render('products', { result: products, pID: id, x: req.session.count });
+    res.render('products', { result: products, x: req.session.count });
   } catch {
     res.status(500).send("Error adding to cart");
   }
@@ -124,7 +124,7 @@ app.get("/Destroy_Cart", async (req, res) => {
   req.session.cart = [];
   req.session.count = 0;
   const products = await productsData.find().exec();
-  res.render('products', { result: products, pID: req.session.userId, x: (req.session.count || 0) });
+  res.render('products', { result: products, x: (req.session.count || 0) });
 });
 
 app.post('/register', async (req, res) => {
@@ -143,6 +143,10 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   try {
+    if(req.body.email=="Admin1@gmail.com" && req.body.password == "Admin1"){
+       req.session.isAdmin = true;
+      return res.render('indexAdmin', { name: "Admin" });
+    }
     const allData = await cusData.find();
     for (const element of allData) {
       const isMatch = await bcrypt.compare(req.body.password, element.password);
@@ -158,32 +162,88 @@ app.post('/login', async (req, res) => {
   }
 });
 
+
+
 app.post("/submit-order", async (req, res) => {
   try {
     const { productIDs, quantities, location, phone } = req.body;
-    const orderItems = productIDs.map((id, index) => ({ productID: id, quantity: parseInt(quantities[index], 10) }));
-    let total = 0, nameOfPro = [], userQuan = [], priceOfPro = [];
+    const orderItems = productIDs.map((id, index) => ({ 
+      productID: id, 
+      quantity: parseInt(quantities[index], 10) 
+    }));
+
+    let total = 0;
+    const items = [];
+    const nameOfPro = [];
+    const userQuan = [];
+    const priceOfPro = [];
+
     for (let item of orderItems) {
       const proData = await productsData.findById(item.productID);
       const availableQuantity = proData.quantity;
+
       if (availableQuantity < item.quantity) {
-        const message = availableQuantity === 0 ? `Sorry this product not available` : `Sorry There are ${availableQuantity} Shoe /s Only`;
+        const message = availableQuantity === 0 
+          ? "Sorry, this product is not available" 
+          : `Sorry, there are only ${availableQuantity} items available`;
         return res.render("error", { message, returnUrl: "Products.ejs" });
       }
-      await productsData.findByIdAndUpdate(item.productID, { $inc: { quantity: -item.quantity } });
+
+      await productsData.findByIdAndUpdate(item.productID, { 
+        $inc: { quantity: -item.quantity } 
+      });
+
+      items.push({
+        name: proData.name,
+        productID: item.productID,
+        pricePerShoe: proData.price,
+        quantitySold: item.quantity
+      });
+
       nameOfPro.push(proData.name);
       priceOfPro.push(proData.price);
       userQuan.push(item.quantity);
       total += item.quantity * proData.price;
     }
-    const orderInfo = { nameOfPro, userQuan, priceOfPro, location, phone, total, date: new Date().toLocaleString() };
+
+    const userID = req.session.userId;
+    calcSaveProfits(items,total,userID)
+    const orderInfo = { 
+      nameOfPro, 
+      userQuan, 
+      priceOfPro, 
+      location, 
+      phone, 
+      total, 
+      date: new Date().toLocaleString() 
+    };
+
     req.session.cart = [];
     req.session.count = 0;
+
     res.render("invoice", { order: orderInfo });
-  } catch {
+  } catch (error) {
+    console.error("Order processing error:", error);
     res.status(500).send("Order processing error");
   }
 });
+
+async function calcSaveProfits(items,total,uID){
+  try {
+
+    const profitRecord = new profitsData({
+      items,
+      totalPrice: total,
+      userID: uID
+    });
+    await profitRecord.save();
+    console.log("Profits saved in DB")
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+app.get("/indexAdmin",(req,res)=> {return res.render('indexAdmin', { name: "Admin" });});
 
 app.get("/review.ejs", async (req, res) => {
   const allReviews = await userReview.find().sort({ _id: -1 });
@@ -200,6 +260,44 @@ app.post("/userReview", async (req, res) => {
     res.status(500).send("Error saving review");
   }
 });
+
+
+// Admin Apis
+
+app.get("/displaySolds", async (req, res) => {
+  try {
+    const allProfits = await profitsData.find().exec();
+    res.render("display_solds", { profits: allProfits });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error fetching data");
+  }
+});
+
+app.post("/addProduct", async(req,res)=>{
+  try {
+      return res.render("add_product")
+  } catch (error) {
+    console.log(error)
+  }
+})
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.post('/saveProduct', async (req, res) => {
+  try {
+    let products = req.body.products;
+    if (typeof products === 'string') products = JSON.parse(products);
+    await productsData.insertMany(products);
+    return res.render('indexAdmin', { name: 'Admin' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
+
+
 
 mongoose.connect(pathDB)
   .then(() => {

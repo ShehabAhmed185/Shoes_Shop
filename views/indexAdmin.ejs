@@ -20,11 +20,16 @@
                 
           
                 <ul>
-                <li><a href="/index.ejs">Home</a></li>
-                <li><a href="/products.ejs">Products</a></li>
-                <li><a href="/about.ejs">About</a></li>
-                <li><a href="/review.ejs">Review</a></li>
-                <li><a href="/services.ejs">Services</a></li>
+                    <li>
+                    <form action="/addProduct" method="POST" style="display:inline;">
+                        <button type="submit" style="all:unset; cursor:pointer; color:inherit; text-decoration:inherit;">
+                        Add Product
+                        </button>
+                    </form>
+                    </li>
+
+                <li><a href="/displaySolds">Show Solds</a></li>
+             
                 </ul>
 
             <div class="icons">
@@ -40,13 +45,7 @@
             <div class="main_content">
                 <div class="main_text">
                     <h1>Hello<br><span><%= name %></span></h1>
-                    <p>
-                   Welcome to Our Brand, where exceptional craftsmanship meets timeless 
-                   design. We're passionate about creating footwear that doesn't just complete 
-                   your outfit but elevates your every step. Whether you're chasing urban adventures,
-                    seeking athletic performance, or making a fashion statement, our curated 
-                    collection delivers unbeatable comfort without compromising on style
-                    </p>
+                
                 </div>
                 <div class="main_image">
                     <img src="/image/shoes.png" alt="Nike Shoes">
@@ -57,10 +56,6 @@
                 <i class="fa-brands fa-twitter"></i>
                 <i class="fa-brands fa-instagram"></i>
                 <i class="fa-brands fa-linkedin-in"></i>
-            </div>
-            <div class="button">
-                <a href="products.ejs">SHOP NOW</a>
-                <i class="fa-solid fa-chevron-right"></i>
             </div>
         </div>
     </section>

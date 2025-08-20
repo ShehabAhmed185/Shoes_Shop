@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sold Collections</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+    }
+
+    .topbar {
+      width: 95%;
+      margin: 16px auto 0;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .home-btn {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      background: #ffffff;
+      text-decoration: none;
+      color: #333;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      transition: transform 0.05s ease, box-shadow 0.2s ease;
+    }
+    .home-btn:hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .home-btn:active {
+      transform: scale(0.98);
+    }
+
+    h1 {
+      text-align: center;
+      margin: 10px 0 20px;
+      color: #333;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 95%;
+      margin: 20px auto;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #343a40;
+      color: white;
+      font-size: 15px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .products {
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .product-item {
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      padding: 6px 10px;
+      margin-bottom: 6px;
+      border-radius: 5px;
+    }
+
+    .product-item strong {
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="home-btn" href="/indexAdmin">← Back to Home</a>
+  </div>
+
+  <h1>Sold Collections</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Date</th>
+        <th>Products</th>
+        <th>Total Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (profits.length > 0) { %>
+        <% profits.forEach(profit => { %>
+          <tr>
+            <td><%= profit.userID %></td>
+            <td><%= profit.curDate %></td>
+            <td class="products">
+              <% profit.items.forEach(item => { %>
+                <div class="product-item">
+                  <strong><%= item.name %></strong><br>
+                  ID: <%= item.productID %><br>
+                  Price: <%= item.pricePerShoe %> × Qty: <%= item.quantitySold %>
+                </div>
+              <% }) %>
+            </td>
+            <td><%= profit.totalPrice %></td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr>
+          <td colspan="4">No sold items found.</td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</body>
+</html>
